@@ -45,6 +45,7 @@ def online_pick(src_repo: str, dst_repo: str):
             )
 
             pick_from_package(zip_file, td_dst)
+            td_src.cleanup()
             upload_directory_as_archive(
                 local_directory=td_dst,
                 repo_id=dst_repo,
