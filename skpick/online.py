@@ -78,6 +78,10 @@ def online_pick(src_repo: str, dst_repo: str):
 
             df = pd.DataFrame(df_rows)
             with open(os.path.join(td_doc, 'README.md'), 'w') as f:
+                print('---', file=f)
+                print('license: mit', file=f)
+                print('---', file=f)
+                print('', file=f)
                 print(df.to_markdown(index=False), file=f)
             with open(os.path.join(td_doc, 'index.json'), 'w') as f:
                 json.dump(dst_index, f, indent=4, ensure_ascii=False)
