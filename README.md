@@ -1,3 +1,3 @@
 # skpick
 
-Picker for skpick
+Picker for skpick, just bullshit
