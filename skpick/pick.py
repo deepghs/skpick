@@ -1,6 +1,7 @@
 import os
 import shutil
 
+import filetype
 from hfutils.utils import walk_files
 from tqdm.auto import tqdm
 
@@ -14,6 +15,12 @@ def pick_from_package(zip_file: str, dst_dir: str):
         type_ = check_type(file)
         if type_ is not None:
             dst_file = os.path.join(dst_dir, type_, relpath)
+            _, ext = os.path.splitext(os.path.basename(dst_file))
+            if not ext:
+                ext = filetype.guess_extension(file)
+                if ext:
+                    dst_file = dst_file + '.' + ext
+
             if os.path.dirname(dst_file):
                 os.makedirs(os.path.dirname(dst_file), exist_ok=True)
             shutil.copyfile(file, dst_file)

@@ -10,3 +10,4 @@ pandas
 natsort
 di-toolkit
 tabulate
+filetype
