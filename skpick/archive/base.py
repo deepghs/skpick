@@ -57,7 +57,7 @@ def get_archive_type(archive_file: str) -> str:
     raise ValueError(f'Unknown type of archive file {archive_file!r}.')
 
 
-def archive_unpack(archive_file: str, silent: bool = False):
+def archive_unpack(archive_file: str, silent: bool = False, base_dir: str = '.'):
     """
     Unpack an archive file into a directory using the specified archive type.
 
@@ -65,10 +65,18 @@ def archive_unpack(archive_file: str, silent: bool = False):
     :type archive_file: str
     :param silent: If True, suppress warnings during the unpacking process.
     :type silent: bool
-
+    :param base_dir: Base directory on relative directory when yielded.
+    :type base_dir: str
     :return: The path to the unpacked directory.
     :rtype: str
     """
     type_name = get_archive_type(archive_file)
     _, fn_unpack = _KNOWN_ARCHIVE_TYPES[type_name]
-    yield from fn_unpack(archive_file, silent=silent)
+    for file, relpath in fn_unpack(archive_file, silent=silent):
+        full_relpath = os.path.join(base_dir, relpath)
+        try:
+            get_archive_type(file)
+        except ValueError:
+            yield file, full_relpath
+        else:
+            yield from archive_unpack(file, silent, full_relpath)
