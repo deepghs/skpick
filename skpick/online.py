@@ -35,8 +35,9 @@ def online_pick(src_repo: str, dst_repo: str):
     dst_packages = [item['filename'] for item in dst_index]
 
     for package in tqdm(natsorted(set(src_packages) - set(dst_packages))):
-        with TemporaryDirectory() as td_src, TemporaryDirectory() as td_dst, TemporaryDirectory() as td_doc:
-            zip_file = os.path.join(td_src, package)
+        o_td_src = TemporaryDirectory()
+        with TemporaryDirectory() as td_dst, TemporaryDirectory() as td_doc:
+            zip_file = os.path.join(o_td_src.name, package)
             download_file_to_file(
                 local_file=zip_file,
                 repo_id=src_repo,
@@ -45,7 +46,7 @@ def online_pick(src_repo: str, dst_repo: str):
             )
 
             pick_from_package(zip_file, td_dst)
-            td_src.cleanup()
+            o_td_src.cleanup()
             upload_directory_as_archive(
                 local_directory=td_dst,
                 repo_id=dst_repo,
