@@ -1,2 +1,3 @@
 # skpick
-Picker for pyskeb
+
+Picker for skpick

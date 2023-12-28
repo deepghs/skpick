@@ -1,0 +1,9 @@
+hbutils>=0.9.0
+requests
+git+https://github.com/deepghs/hfutils.git@main#egg=hfutils[7z,rar]
+huggingface_hub
+dghs-imgutils>=0.3.2
+tqdm
+numpy
+pillow
+pandas
