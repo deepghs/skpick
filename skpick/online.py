@@ -73,7 +73,7 @@ def online_pick(src_repo: str, dst_repo: str):
             for item in dst_index[::-1]:
                 row = copy.deepcopy(item)
                 download_url = hf_hub_url(repo_id=dst_repo, repo_type='dataset', filename=item['filename'])
-                row['download'] = f'![download]({download_url})'
+                row['download'] = f'[download]({download_url})'
                 df_rows.append(row)
 
             df = pd.DataFrame(df_rows)
