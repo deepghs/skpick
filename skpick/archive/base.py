@@ -1,4 +1,5 @@
 import os.path
+import warnings
 from typing import List, Dict, Tuple, Callable
 
 _KNOWN_ARCHIVE_TYPES: Dict[str, Tuple[List[str], Callable]] = {}
@@ -79,4 +80,7 @@ def archive_unpack(archive_file: str, silent: bool = False, base_dir: str = '.')
         except ValueError:
             yield file, full_relpath
         else:
-            yield from archive_unpack(file, silent, full_relpath)
+            try:
+                yield from archive_unpack(file, silent, full_relpath)
+            except Exception as err:
+                warnings.warn(repr(err))
