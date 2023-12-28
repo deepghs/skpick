@@ -3,7 +3,8 @@ import os.path
 
 import pandas as pd
 from ditk import logging
-from hfutils.operate import get_hf_fs, download_file_to_file, upload_directory_as_directory, get_hf_client
+from hfutils.operate import get_hf_fs, download_file_to_file, get_hf_client, \
+    upload_directory_as_archive, upload_directory_as_directory
 from hfutils.utils import tqdm, TemporaryDirectory
 from natsort import natsorted
 
@@ -32,7 +33,7 @@ def online_pick(src_repo: str, dst_repo: str):
     dst_packages = [item['filename'] for item in dst_index]
 
     for package in tqdm(natsorted(set(src_packages) - set(dst_packages))):
-        with TemporaryDirectory() as td_src, TemporaryDirectory() as td_dst:
+        with TemporaryDirectory() as td_src, TemporaryDirectory() as td_dst, TemporaryDirectory() as td_doc:
             zip_file = os.path.join(td_src, package)
             download_file_to_file(
                 local_file=zip_file,
@@ -42,6 +43,14 @@ def online_pick(src_repo: str, dst_repo: str):
             )
 
             pick_from_package(zip_file, td_dst)
+            upload_directory_as_archive(
+                local_directory=td_dst,
+                repo_id=dst_repo,
+                repo_type='dataset',
+                archive_in_repo=package,
+                message=f'Pick from {package!r}',
+            )
+
             dst_index.append({
                 'filename': package,
                 **{
@@ -61,13 +70,13 @@ def online_pick(src_repo: str, dst_repo: str):
                 df_rows.append(item)
 
             df = pd.DataFrame(df_rows)
-            with open(os.path.join(td_dst, 'README.md'), 'w') as f:
+            with open(os.path.join(td_doc, 'README.md'), 'w') as f:
                 print(df.to_markdown(index=False), file=f)
-            with open(os.path.join(td_dst, 'index.json'), 'w') as f:
+            with open(os.path.join(td_doc, 'index.json'), 'w') as f:
                 json.dump(dst_index, f, indent=4, ensure_ascii=False)
 
             upload_directory_as_directory(
-                local_directory=td_dst,
+                local_directory=td_doc,
                 repo_id=dst_repo,
                 repo_type='dataset',
                 path_in_repo='.',
