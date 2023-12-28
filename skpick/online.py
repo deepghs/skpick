@@ -1,3 +1,4 @@
+import copy
 import json
 import os.path
 
@@ -6,6 +7,7 @@ from ditk import logging
 from hfutils.operate import get_hf_fs, download_file_to_file, get_hf_client, \
     upload_directory_as_archive, upload_directory_as_directory
 from hfutils.utils import tqdm, TemporaryDirectory
+from huggingface_hub import hf_hub_url
 from natsort import natsorted
 
 from .pick import pick_from_package
@@ -67,7 +69,12 @@ def online_pick(src_repo: str, dst_repo: str):
                 for name in names:
                     if name not in item:
                         item[name] = 0
-                df_rows.append(item)
+
+            for item in dst_index[::-1]:
+                row = copy.deepcopy(item)
+                download_url = hf_hub_url(repo_id=dst_repo, repo_type='dataset', filename=item['filename'])
+                row['download'] = f'![download]({download_url})'
+                df_rows.append(row)
 
             df = pd.DataFrame(df_rows)
             with open(os.path.join(td_doc, 'README.md'), 'w') as f:
