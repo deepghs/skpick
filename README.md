@@ -23,3 +23,18 @@ pick_from_dir_of_packages(
     '/your/directory/to/save',  # files from all the packages will be stored to this directory
 )
 ```
+
+Flatten all files (including archive files) to another directory
+
+```python
+import os
+
+from skpick.flatten import flatten_to_directory
+
+src_dir = '/from/directory'
+dst_dir = '/drive/f/ts'
+os.makedirs(dst_dir, exist_ok=True)
+
+if __name__ == '__main__':
+    flatten_to_directory(src_dir, dst_dir)
+```

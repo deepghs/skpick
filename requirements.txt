@@ -1,6 +1,6 @@
 hbutils>=0.9.0
 requests
-git+https://github.com/deepghs/hfutils.git@main#egg=hfutils[7z,rar]
+hfutils[7z,rar]>=0.2.2
 huggingface_hub
 dghs-imgutils>=0.3.2
 tqdm
