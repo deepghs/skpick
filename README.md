@@ -2,6 +2,16 @@
 
 Picker for skpick, just bullshit
 
+## Installation
+
+```shell
+git clone https://github.com/deepghs/skpick.git
+cd skpick
+pip install -r requirements.txt
+```
+
+## Usage
+
 Extract from one zip file
 
 ```python
