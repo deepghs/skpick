@@ -10,13 +10,17 @@ Image.MAX_IMAGE_PIXELS = None
 
 def is_hqimage(file, face_threshold: int = 5000):
     try:
-        image = load_image(file)
+        image = Image.open(file)
     except UnidentifiedImageError:
         return False
     except OSError:
         warnings.warn(f'File {file} is truncated or corrupted, skipped.')
         return False
 
+    if image.width * image.height >= 8000 ** 2:
+        return True
+
+    image = load_image(image)
     if anime_real(image)[0] != 'anime':
         return False
     if anime_classify(image)[0] != 'illustration':
