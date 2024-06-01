@@ -20,8 +20,8 @@ def is_hqimage(file, face_threshold: int = 5000):
     if image.width * image.height >= 8000 ** 2:
         return True
 
-    image = load_image(image)
     try:
+        image = load_image(image)
         if anime_real(image)[0] != 'anime':
             return False
         if anime_classify(image)[0] != 'illustration':
