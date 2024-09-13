@@ -11,6 +11,7 @@ Image.MAX_IMAGE_PIXELS = None
 def is_hqimage(file, face_threshold: int = 5000):
     try:
         image = Image.open(file)
+        image.load()
     except UnidentifiedImageError:
         return False
     except OSError:
