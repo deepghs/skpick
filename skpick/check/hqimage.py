@@ -11,7 +11,6 @@ Image.MAX_IMAGE_PIXELS = None
 def is_hqimage(file, face_threshold: int = 5000):
     try:
         image = Image.open(file)
-        image.load()
     except UnidentifiedImageError:
         return False
     except OSError:
@@ -32,7 +31,7 @@ def is_hqimage(file, face_threshold: int = 5000):
             area = abs((x1 - x0) * (y1 - y0))
             if area >= face_threshold:
                 return True
-    except OSError:
+    except (OSError, SyntaxError):
         return False
 
     return False
