@@ -4,7 +4,7 @@ import os.path
 
 import pandas as pd
 from ditk import logging
-from hfutils.operate import get_hf_fs, download_file_to_file, get_hf_client, \
+from hfutils.operate import download_file_to_file, get_hf_client, \
     upload_directory_as_archive, upload_directory_as_directory
 from hfutils.utils import tqdm, TemporaryDirectory
 from huggingface_hub import hf_hub_url
@@ -16,20 +16,28 @@ logging.try_init_root(level=logging.INFO)
 
 
 def online_pick(src_repo: str, dst_repo: str):
-    hf_fs = get_hf_fs()
     hf_client = get_hf_client()
-    if hf_fs.exists(f'datasets/{src_repo}/index.json'):
-        src_packages = [
-            item['filename'] for item in
-            json.loads(hf_fs.read_text(f'datasets/{src_repo}/index.json'))
-        ]
+    if hf_client.file_exists(repo_id=src_repo, repo_type='dataset', filename='index.json'):
+        src_index_content = hf_client.hf_hub_download(
+            repo_id=src_repo,
+            repo_type='dataset',
+            filename='index.json'
+        )
+        with open(src_index_content, 'r') as f:
+            src_packages = [item['filename'] for item in json.load(f)]
     else:
         src_packages = []
 
     if not hf_client.repo_exists(repo_id=dst_repo, repo_type='dataset'):
         hf_client.create_repo(repo_id=dst_repo, repo_type='dataset', private=True, exist_ok=True)
-    if hf_fs.exists(f'datasets/{dst_repo}/index.json'):
-        dst_index = json.loads(hf_fs.read_text(f'datasets/{dst_repo}/index.json'))
+    if hf_client.file_exists(repo_id=dst_repo, repo_type='dataset', filename='index.json'):
+        dst_index_content = hf_client.hf_hub_download(
+            repo_id=dst_repo,
+            repo_type='dataset',
+            filename='index.json'
+        )
+        with open(dst_index_content, 'r') as f:
+            dst_index = json.load(f)
     else:
         dst_index = []
     dst_packages = [item['filename'] for item in dst_index]
