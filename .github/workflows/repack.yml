@@ -67,6 +67,7 @@ jobs:
         env:
           CI: 'true'
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
+          HF_ENDPOINT: ${{ secrets.HF_ENDPOINT }}
           HF_SRC_REPO: ${{ secrets.HF_SRC_REPO }}
           HF_DST_REPO: ${{ secrets.HF_DST_REPO }}
         shell: bash
