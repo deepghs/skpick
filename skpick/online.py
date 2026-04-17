@@ -1,6 +1,7 @@
 import copy
 import json
 import os.path
+import time
 
 import pandas as pd
 from ditk import logging
@@ -13,6 +14,34 @@ from natsort import natsorted
 from .pick import pick_from_package
 
 logging.try_init_root(level=logging.INFO)
+
+
+def _download_package_with_retries(src_repo: str, package: str, local_file: str,
+                                   max_retries: int = 3, retry_wait_time: float = 5.0) -> bool:
+    for attempt in range(max_retries):
+        if os.path.exists(local_file):
+            os.remove(local_file)
+
+        try:
+            download_file_to_file(
+                local_file=local_file,
+                repo_id=src_repo,
+                repo_type='dataset',
+                file_in_repo=f'packs/{package}',
+            )
+        except Exception as err:
+            if attempt + 1 < max_retries:
+                logging.warning(
+                    f'Download {package!r} failed on attempt {attempt + 1}/{max_retries} - {err!r}, retry later.'
+                )
+                time.sleep(retry_wait_time)
+            else:
+                logging.exception(f'Download {package!r} failed after {max_retries} attempts, skipped.')
+                return False
+        else:
+            return True
+
+    return False
 
 
 def online_pick(src_repo: str, dst_repo: str):
@@ -46,12 +75,9 @@ def online_pick(src_repo: str, dst_repo: str):
         o_td_src = TemporaryDirectory()
         with TemporaryDirectory() as td_dst, TemporaryDirectory() as td_doc:
             zip_file = os.path.join(o_td_src.name, package)
-            download_file_to_file(
-                local_file=zip_file,
-                repo_id=src_repo,
-                repo_type='dataset',
-                file_in_repo=f'packs/{package}',
-            )
+            if not _download_package_with_retries(src_repo=src_repo, package=package, local_file=zip_file):
+                o_td_src.cleanup()
+                continue
 
             pick_from_package(zip_file, td_dst)
             o_td_src.cleanup()
